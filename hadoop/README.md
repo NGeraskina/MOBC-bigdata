@@ -167,4 +167,5 @@ $ sudo ln -s /etc/nginx/sites-available/nn /etc/nginx/sites-enabled/nn
 проверяем в браузере: http://176.109.91.11:9870/index.html
 все работает
 
+![1](https://github.com/user-attachments/assets/6fa91b5f-881f-45cd-aff6-b12c36431eef)
 
