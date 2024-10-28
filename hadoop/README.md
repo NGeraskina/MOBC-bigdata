@@ -1,5 +1,7 @@
 # Задание 1 - настройка hadoop кластера
 
+## настройка окружения
+
 для работы hadoop нужна java
 ставим java на все 4 машины поочередно (было в пререквизитах что она стоит но по умолчанию в убунту это не так)
 
@@ -40,9 +42,10 @@
 
 **все это делаем на всех 4 машинах**
 
-далее сначала на неймноде
+## настройка конфигурационных файлов Hadoop
 
-Настройка конфигурационных файлов Hadoop core-site.xml (в папке $HADOOP_HOME/etc/hadoop/):
+далее сначала на неймноде
+core-site.xml (в папке $HADOOP_HOME/etc/hadoop/):
 
 `
 <configuration><br>
@@ -72,14 +75,96 @@ team-9-dn-01<br>
 
 после этого размножам эти 3 файла на team-9-dn-00 и team-9-dn-01
 
-`scp core-site.xml team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>
-`scp core-site.xml team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>
+```
+$ scp core-site.xml team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/
+$ scp core-site.xml team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/
 
-`scp hdfs-site.xml team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>
-`scp hdfs-site.xml team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>  
+$ scp hdfs-site.xml team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/
+$ scp hdfs-site.xml team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/
 
-`scp workers team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>
-`scp workers team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/` <br>
+$ scp workers team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/
+$ scp workers team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/
+```
 
+## форматирование файловой системы
+
+`$ hadoop-3.4.0/bin/hdfs namenode -format`<br>
+
+запускаем
+
+`$ hadoop-3.4.0/sbin/start-dfs.sh`    (остановить - stop-dfs.sh)<br>
+
+```
+Starting namenodes on [team-9-nn]
+Starting datanodes
+team-9-nn: datanode is running as process 85697.  Stop it first and ensure /tmp/hadoop-hadoop-datanode.pid file is empty before retry.
+team-9-dn-00: datanode is running as process 62138.  Stop it first and ensure /tmp/hadoop-hadoop-datanode.pid file is empty before retry.
+team-9-dn-01: datanode is running as process 61912.  Stop it first and ensure /tmp/hadoop-hadoop-datanode.pid file is empty before retry.
+Starting secondary namenodes [team-9-nn]
+```
+
+все работает
+
+## проверим что все работает
+
+можно проверить (jps это типа java ps) неймнода
+
+```
+hadoop@team-9-nn:~/hadoop-3.4.0$ jps
+85697 DataNode
+86189 NameNode
+86653 Jps
+86508 SecondaryNameNode
+```
+
+датаноды
+
+```
+hadoop@team-9-dn-00:~$ jps
+62342 Jps
+62138 DataNode
+```
+```
+hadoop@team-9-dn-01:~$ jps
+61912 DataNode
+62092 Jps
+```
+
+## настройка reverse-proxy на джамп ноде
+
+идем на джамп ноду. там уже есть nginx. (если его нет то `sudo apt install nginx)
+
+копируем из под sudo 
+
+`$ sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/nn`
+
+делаем из под рута 2 правки в конфиге
+
+```
+server {
+	listen 9870 default_server;
+    ...
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		#try_files $uri $uri/ =404;
+		proxy_pass http://team-9-nn:9870;
+	}
+
+    ...
+}
+```
+
+делаем символьную ссылку в папку доступных
+
+$ sudo ln -s /etc/nginx/sites-available/nn /etc/nginx/sites-enabled/nn
+ 
+перезапуск инджиникса
+
+`$ sudo systemctl reload nginx`
+
+проверяем в браузере: http://176.109.91.11:9870/index.html
+все работает
 
 
