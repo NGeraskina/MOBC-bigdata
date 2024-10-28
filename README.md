@@ -50,11 +50,5 @@
 `scp ~/.ssh/authorized_keys team-1-dn-0:/home/team/.ssh`<br>
 `scp ~/.ssh/authorized_keys team-1-dn-1:/home/team/.ssh`<br>
 
-ставим java на все 4 машины поочередно (было в пререквизитах что она стоит но по умолчанию в убунту это не так)
-
-`sudo apt update`<br>
-`sudo apt install openjdk-11-jdk -y`
-
-
 
 
