@@ -10,9 +10,9 @@
 192.168.1.40 дата-нода (team-9-dn-00)<br>
 192.168.1.41 дата-нода (team-9-dn-01)<br>
 
-*задача 1* - установить и развернуть hadoop-кластер 
-*задача 2* - установить и настроить YARN
-*задача 3* - установить и настроить HIVE
+[задача 1](https://github.com/shiltsov/MOBC-bigdata/tree/main/hadoop) - установить и развернуть hadoop-кластер <br>
+[задача 2](https://github.com/shiltsov/MOBC-bigdata/tree/main/yarn) - установить и настроить YARN<br>
+[задача 3](https://github.com/shiltsov/MOBC-bigdata/tree/main/hive) - установить и настроить HIVE<br>
 
 ## команда
 Рубашевский Кирилл<br>
