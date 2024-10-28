@@ -1,14 +1,14 @@
 # Задание 1 - настройка hadoop кластера
 
-## настройка окружения
+## Настройка окружения
 
-для работы hadoop нужна java
-ставим java на все 4 машины поочередно (было в пререквизитах что она стоит но по умолчанию в убунту это не так)
+1. Для работы hadoop нужна Java
+Устанавливаем Java на все 4 машины поочередно (по умолчанию в Ubuntu она не установлена)
 
 `$ sudo apt update`<br>
 `$ sudo apt install openjdk-11-jdk -y`
 
-проверим работу
+Проверка успешной установки
 
 `$ java --version`
 
@@ -16,35 +16,32 @@
 `OpenJDK Runtime Environment (build 11.0.24+8-post-Ubuntu-1ubuntu324.04.1)`<br>
 `OpenJDK 64-Bit Server VM (build 11.0.24+8-post-Ubuntu-1ubuntu324.04.1, mixed mode, sharing)`<br>
 
-качаем **hadoop 3.4** на джамп-ноду под пользователем hadoop
+2. Качаем **hadoop 3.4** на джамп-ноду под пользователем hadoop и размножаем на все машины
 
 `$ wget https://dlcdn.apache.org/hadoop/common/hadoop-3.4.0/hadoop-3.4.0.tar.gz`
-
-и размножаем на все машины
 
 `$ scp hadoop-3.4.0.tar.gz team-1-nn:/home/hadoop`<br>
 `$ scp hadoop-3.4.0.tar.gz team-1-dn-00:/home/hadoop`<br>
 `$ scp hadoop-3.4.0.tar.gz team-1-dn-01:/home/hadoop`<br>
 
-у пользователя hadoop настраиваем переменные окружения в файле ~/.profile
+3. У пользователя hadoop настраиваем переменные окружения в файле ~/.profile и активируем
 
 `$ export HADOOP_HOME=/home/hadoop/hadoop-3.4.0`<br>
-`$ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64`
+`$ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64`<br>
 `$ export PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin/:$HADOOP_HOME/sbin`
-
-активируем
 
 `$ source ~/.profile`
 
-еще Саттар говорит что нужно для гарантии в ~/hadoop-3.4.0/etc/hadoop/hadoop-env.sh прописать
+4. Для гарантии в ~/hadoop-3.4.0/etc/hadoop/hadoop-env.sh прописывем
 
 `JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64`
 
-**все это делаем на всех 4 машинах**
+**Повторяем на всех 4 машинах**
 
-## настройка конфигурационных файлов Hadoop
+## Настройка конфигурационных файлов Hadoop
 
-далее сначала на неймноде
+1. Настраиваем конфигурацию на неймноде
+
 core-site.xml (в папке $HADOOP_HOME/etc/hadoop/):
 
 `
@@ -73,7 +70,7 @@ team-9-dn-00<br>
 team-9-dn-01<br>
 `
 
-после этого размножам эти 3 файла на team-9-dn-00 и team-9-dn-01
+2. Размножам эти 3 файла на team-9-dn-00 и team-9-dn-01
 
 ```
 $ scp core-site.xml team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/
@@ -86,12 +83,11 @@ $ scp workers team-9-dn-00:/home/hadoop/hadoop-3.4.0/etc/hadoop/
 $ scp workers team-9-dn-01:/home/hadoop/hadoop-3.4.0/etc/hadoop/
 ```
 
-## форматирование файловой системы
+## Форматирование файловой системы
 
 `$ hadoop-3.4.0/bin/hdfs namenode -format`<br>
 
-запускаем
-
+Запуск: 
 `$ hadoop-3.4.0/sbin/start-dfs.sh`    (остановить - stop-dfs.sh)<br>
 
 ```
@@ -103,9 +99,7 @@ team-9-dn-01: datanode is running as process 61912.  Stop it first and ensure /t
 Starting secondary namenodes [team-9-nn]
 ```
 
-все работает
-
-## проверим что все работает
+## Проверка, что все работает
 
 можно проверить (jps это типа java ps) неймнода
 
@@ -130,15 +124,15 @@ hadoop@team-9-dn-01:~$ jps
 62092 Jps
 ```
 
-## настройка reverse-proxy на джамп ноде
+## Настройка reverse-proxy на джамп ноде
 
-идем на джамп ноду. там уже есть nginx. (если его нет то `sudo apt install nginx)
+идем на джамп ноду. там уже есть nginx. (если его нет, то применить `sudo apt install nginx`)
 
-копируем из под sudo 
+1. Копируем из под sudo 
 
 `$ sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/nn`
 
-делаем из под рута 2 правки в конфиге
+2. Делаем из под рута 2 правки в конфиге
 
 ```
 server {
@@ -156,16 +150,15 @@ server {
 }
 ```
 
-делаем символьную ссылку в папку доступных
+3. Делаем символьную ссылку в папку доступных
 
-$ sudo ln -s /etc/nginx/sites-available/nn /etc/nginx/sites-enabled/nn
+`$ sudo ln -s /etc/nginx/sites-available/nn /etc/nginx/sites-enabled/nn`
  
-перезапуск инджиникса
+4. Перезапуск инджиникса
 
 `$ sudo systemctl reload nginx`
 
-проверяем в браузере: http://176.109.91.11:9870/index.html
-все работает
+5. Проверяем в браузере: http://176.109.91.11:9870/index.html
 
 ![1](https://github.com/user-attachments/assets/6fa91b5f-881f-45cd-aff6-b12c36431eef)
 
